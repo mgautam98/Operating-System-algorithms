@@ -4,9 +4,10 @@
 1. FCFS
 2. RR 
 3. SJN 
-4. PRIORITY
-5. STR non preemptive
-6. STR preemptive
+4. PRIORITY non preemptive
+5. PRIORITY preemptive
+6. STR non preemptive
+7. STR preemptive
 
 ## SEMAPHORE, MUTEX, MUTUAL EXCLUSION
 1. Semaphores 
