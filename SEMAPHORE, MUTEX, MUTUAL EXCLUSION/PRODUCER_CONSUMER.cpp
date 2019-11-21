@@ -1,7 +1,5 @@
-#include <iostream>
-#include <pthread.h>
-#include <semaphore.h>
-#include <random>
+#include <bits/stdc++.h>
+#include "Semaphore.h"
 #include <unistd.h>
 
 using namespace std;
@@ -9,43 +7,40 @@ using namespace std;
 #define BUFFER_SIZE 10
 
 int buffer[BUFFER_SIZE];
-int index=0;
+int Index  =0;
 
-sem_t full,empty;
-pthread_mutex_t mutex;
+Semaphore full,empt(BUFFER_SIZE);
+mutex mu;
 
-void* produce(void* arg){
+void produce(){
 	while(1){
 		sleep(1);
-		sem_wait(&empty);
-		pthread_mutex_lock(&mutex);
+		empt.wait();
+		mu.lock();
 		int item = rand()%100;
-		buffer[index++] = item;
+		buffer[Index++] = item;
 		cout<<"Produced "<<item<<endl;
-		pthread_mutex_unlock(&mutex);
-		sem_post(&full);
+		mu.unlock();
+		full.signal();
 	}
 }
 
-void* consume(void* arg){
+void consume(){
 	while(1){
 		sleep(1);
-		sem_wait(&full);
-		pthread_mutex_lock(&mutex);
-		int item = buffer[--index];
+		full.wait();
+		mu.lock();
+		int item = buffer[--Index];
 		cout<<"Consumed "<<item<<endl;
-		pthread_mutex_unlock(&mutex);
-		sem_post(&empty);
+		mu.unlock();
+		empt.signal();
 	}
 }
 
 int main(){
-	pthread_t producer,consumer;
-	sem_init(&empty,0,BUFFER_SIZE);
-	sem_init(&full,0,0);
-	pthread_mutex_init(&mutex,NULL);
-	pthread_create(&producer,NULL,produce,NULL);
-	pthread_create(&consumer,NULL,consume,NULL);
-	pthread_exit(NULL);
-}
+	empt.signal();
+    thread t1(produce);
+    thread t2(consume);
+    t1.join();
+    t2.join();
 }
