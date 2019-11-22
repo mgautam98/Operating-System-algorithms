@@ -16,6 +16,7 @@
 4. Dining Philosophers
 5. Cigarette Smoker 
 6. Sleeping Barber
+7. Reader Writer
 
 ## THREADING
 1. fork, display PID, Parent PID of Chlid process 
