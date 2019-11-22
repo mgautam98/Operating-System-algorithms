@@ -12,7 +12,7 @@ void barber()
     while (1)
     {
         customers.wait();
-        mu.unlock();
+        mu.lock();
         waiting = waiting - 1;
         barbers.signal();
         mu.unlock();
@@ -37,7 +37,7 @@ void customer()
         }
         else
         {
-            mu.lock();
+            mu.unlock();
         }
     }
 }
