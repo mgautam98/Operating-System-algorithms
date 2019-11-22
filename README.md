@@ -11,8 +11,11 @@
 
 ## SEMAPHORE, MUTEX, MUTUAL EXCLUSION
 1. Semaphores 
-3. Producer Consumer 
-4. Mutex 
+2. Mutex 
+3. Producer Consmer
+4. Dining Philosophers
+5. Cigarette Smoker 
+6. Sleeping Barber
 
 ## THREADING
 1. fork, display PID, Parent PID of Chlid process 
