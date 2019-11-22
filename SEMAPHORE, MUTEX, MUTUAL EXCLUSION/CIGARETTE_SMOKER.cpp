@@ -19,11 +19,11 @@ void Agent()
             TobaccoAndPaper.signal();
             break;
         case 1:
-            cout<<"Paper has Matches and Paper"<<endl;
+            cout<<"Agent has Paper and Matches"<<endl;
             PaperAndMatches.signal();
             break;
         case 2:
-            cout<<"Matches has Tobacco and Paper"<<endl;
+            cout<<"Agent has Matches and Tobacco"<<endl;
             MatchesAndTobacco.signal();
             break;
         }
