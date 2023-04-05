@@ -1,124 +1,98 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
 using namespace std;
 
-class Process
+struct Process
 {
-public:
-    int PID;
-    double remaining_time;
-    double arrival_time;
-    double execution_time;
-    double last_time;
-    double waiting_time;
-
-    Process()
-    {
-    }
-
-    Process(int PID, double arrival_time, double execution_time)
-    {
-        this->PID = PID;
-        this->arrival_time = arrival_time;
-        this->execution_time = execution_time;
-        last_time = arrival_time;
-        waiting_time = 0;
-        remaining_time = execution_time;
-    }
-
-    void Scan()
-    {
-        cout << "Enter PID : ";
-        cin >> PID;
-        cout << "Enter Arrival Time : ";
-        cin >> arrival_time;
-        cout << "Enter Execution Time : ";
-        cin >> execution_time;
-        last_time = arrival_time;
-        waiting_time = 0;
-        remaining_time = execution_time;
-    }
-
-    void Print()
-    {
-        cout << "|" << PID << "\t|\t" << arrival_time << "\t|\t" << execution_time << "\t|\t" << last_time << "\t|\t" << waiting_time << "\t|" << endl;
-    }
+    int id;
+    int arrival_time;
+    int burst_time;
 };
 
-bool comparator(Process a, Process b)
+bool compare_arrival_time(Process a, Process b)
 {
-    return (a.arrival_time < b.arrival_time);
+    return a.arrival_time < b.arrival_time;
 }
 
-void Output(vector<Process> p)
+bool compare_burst_time(Process a, Process b)
 {
-    cout << "\n\n-------------------------------------------------------------------------\n";
-    cout << "|PID\t|Arrival Time\t|Execution Time\t|Starting Time\t|Waiting Time\t|\n";
-    cout << "-------------------------------------------------------------------------\n";
-    for (auto i : p)
-    {
-        i.Print();
-    }
-    cout << "-------------------------------------------------------------------------\n";
+    return a.burst_time < b.burst_time;
 }
 
 int main()
 {
-
-    freopen("input_RR.txt", "r", stdin);
-    // freopen("output.txt","w",stdout);
-
-    vector<Process> p;
-
     int n;
-    double t;
-    cout << "Enter the time/process : ";
-    cin >> t;
-    cout << "Enter the number of processes : ";
+    cout << "Enter the number of processes: ";
     cin >> n;
+
+    vector<Process> processes(n);
 
     for (int i = 0; i < n; i++)
     {
-        Process temp;
-        temp.Scan();
-        p.push_back(temp);
+        cout << "Enter the process ID, arrival time, and burst time for process " << i + 1 << ": ";
+        cin >> processes[i].id >> processes[i].arrival_time >> processes[i].burst_time;
     }
 
-    sort(p.begin(), p.end(), comparator);
+    // Sort processes based on arrival time
+    sort(processes.begin(), processes.end(), compare_arrival_time);
 
-    double st = 0, wt = 0;
+    vector<int> completion_times(n);
+    vector<int> waiting_times(n);
+    vector<int> turnaround_times(n);
 
-    queue<Process> q;
-    vector<Process> Final;
-    q.push(p[0]);
-    int i = 1;
-    double time_elasped = 0;
-    cout<<endl;
-    while (!q.empty())
+    int current_time = 0;
+
+    for (int i = 0; i < n; i++)
     {
-        Process temp = q.front();
+        // Sort processes based on burst time among those that have arrived
+        sort(processes.begin() + i, processes.end(), compare_burst_time);
 
-        q.pop();
-        temp.waiting_time+= time_elasped - temp.last_time;
-        time_elasped += min(t, temp.remaining_time);
-        for (; p[i].arrival_time <= time_elasped && i < n; i++)
-        {
-            q.push(p[i]);
-        }
+        // Calculate completion time of the current process
+        completion_times[i] = max(current_time, processes[i].arrival_time) + processes[i].burst_time;
 
-        temp.last_time = time_elasped; 
+        // Calculate waiting time and turnaround time of the current process
+        waiting_times[i] = max(0, current_time - processes[i].arrival_time);
+        turnaround_times[i] = completion_times[i] - processes[i].arrival_time;
 
-        temp.remaining_time -= t;
-        if (temp.remaining_time <= 0)
-        {
-            Final.push_back(temp);
-        }
-        else
-        {
-            q.push(temp);
-        }
+        // Update current time
+        current_time = completion_times[i];
     }
 
-    Output(Final);
+    // Calculate average waiting time and turnaround time
+    double avg_waiting_time = 0;
+    double avg_turnaround_time = 0;
+    for (int i = 0; i < n; i++)
+    {
+        avg_waiting_time += waiting_times[i];
+        avg_turnaround_time += turnaround_times[i];
+    }
+    avg_waiting_time /= n;
+    avg_turnaround_time /= n;
+
+    // Print the Gantt chart
+    cout << "Gantt chart:" << endl;
+    current_time = processes[0].arrival_time;
+    for (int i = 0; i < n; i++)
+    {
+        cout << "| P" << processes[i].id << " ";
+        current_time = completion_times[i];
+    }
+    cout << "|" << endl;
+
+    // Print process details, completion times, waiting times, and turnaround times
+    cout << endl
+         << "Process Details:" << endl;
+    cout << "ID\tArrival Time\tBurst Time\tCompletion Time\tWaiting Time\tTurnaround Time" << endl;
+    for (int i = 0; i < n; i++)
+    {
+        cout << processes[i].id << "\t" << processes[i].arrival_time << "\t\t" << processes[i].burst_time << "\t\t" << completion_times[i] << "\t\t" << waiting_times[i] << "\t\t" << turnaround_times[i] << endl;
+    }
+
+    // Print average waiting time and turnaround time
+    cout << endl
+         << "Average Waiting Time: " << avg_waiting_time << endl;
+    cout << "Average Turnaround Time: " << avg_turnaround_time << endl;
 
     return 0;
 }
